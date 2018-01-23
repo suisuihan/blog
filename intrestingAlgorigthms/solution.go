@@ -144,6 +144,34 @@ func FullCharaters(s string)string{
     return ret
 }
 
+func leastBeauties(stationBeauties []int, reachStations [][]int)int{
+    n := len(stationBeauties)
+    if n == 0{
+        return 0 
+    }else if n == 1{
+        return stationBeauties[0]
+    }else if n == 2{
+        return stationBeauties[0] + stationBeauties[1]
+    }
+
+    beauties := make([]int, n)
+    beauties[0] = stationBeauties[0]
+    for i:=1; i < n; i++{
+        minBeauties := beauties[reachStations[i][0]]
+        for j:=1; j < len(reachStations[i]); j++{
+            if minBeauties > beauties[reachStations[i][j]]{
+                minBeauties = beauties[reachStations[i][j]]
+            }
+        }
+        beauties[i] = stationBeauties[i]+minBeauties
+    }
+    return beauties[n-1]
+}
+
+func fullCombine(s string)[]string{
+	charaters := make([]rune, )
+}
+
 func main(){
 	// tests := []struct{
 	// 	input string
@@ -190,5 +218,21 @@ func main(){
 	// 	}
 	// }
 
-	fmt.Println(FullCharaters("abcqweracb"))
+	tests := []struct{
+		stationBeauties []int
+		reachStations [][]int
+		expect int
+		want bool
+	}{
+		{[]int{0,1,1,3,6}, [][]int{[]int{0}, []int{0}, []int{1}, []int{0}, []int{2,3}}, 8, true},
+	}
+	for _, test := range tests{
+		if got := leastBeauties(test.stationBeauties, test.reachStations); (got == test.expect) != test.want{
+			fmt.Printf("leastBeauties(%v, %v)=%d, except=%d, test failed\n", test.stationBeauties, test.reachStations, got, test.expect)
+		}else{
+			fmt.Println(got)
+		}
+	}
+
+	// fmt.Println(FullCharaters("abcqweracb"))
 }
