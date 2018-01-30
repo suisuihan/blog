@@ -248,6 +248,60 @@ func kmp(a string, b string) bool{
 	}
 	return j == lb
 }
+
+func shortestSummary(s string, t string) string{
+	sLength, tLength := len(s), len(t)
+	if sLength < tLength{
+		return s
+	}
+	start, end := 0, -1
+	var absStart, absEnd int
+	shortestLen := sLength
+	mapT := make(map[uint8]int)
+	for i:=0; i < tLength; i++{
+		mapT[t[i]]++
+	}
+	isAllExisted := func(map1 map[uint8]int, map2 map[uint8]int) bool{ 
+		for k, v := range map2{
+			if map1[k] < v{
+				return false
+			}
+		}
+		return true
+	}
+	mapRet := make(map[uint8]int)
+	for {
+		for end < sLength && !isAllExisted(mapRet, mapT){
+			end++
+			for end < sLength{
+				if _, ok := mapT[s[end]]; ok{
+					mapRet[s[end]]++
+					break
+				}else{
+					end++
+				}
+			}			
+		}
+		
+		for isAllExisted(mapRet, mapT){
+			if end - start < shortestLen{
+				shortestLen = end - start
+				absStart = start
+				absEnd = end
+			}
+			if _, ok := mapRet[s[start]]; ok{
+				mapRet[s[start]]--
+			}
+			start++
+		}
+		if end >= sLength{
+			break
+		}
+	}
+	return s[absStart:absEnd+1]
+}
+
+
 func main(){
 	// tests := []struct{
 	// 	input string
@@ -311,20 +365,50 @@ func main(){
 	// }
 
 	// fmt.Println(FullCharaters("abcqweracb"))
+	
+	// tests := []struct{
+	// 	a string
+	// 	b string
+	// 	want bool
+	// }{
+	// 	{"abcabcdabcefghi", "abcdabc", true},
+	// 	{"ddabaad", "aa", true},
+	// 	{"dfasdfasdfasdf", "abcabcabdabc", false},
+	// }
+	// for _, test := range tests{
+	// 	if got := kmp(test.a, test.b); got != test.want{
+	// 		fmt.Printf("kmp(%v, %v)=%t, want=%t, test failed\n", test.a, test.b, got, test.want)
+	// 	}
+	// }
+
+	// a := make(map[string]int)
+	// a["aaa"] = 1
+	// a["bbb"] = 2
+	// b := a
+	// fmt.Println(b)
+	// b["ccc"] = 3
+	// b["aaa"] = 4
+	// fmt.Println(b)
+	// fmt.Println(a)
+	// s := "aaaa"
+	// fmt.Printf("%T\n", s[0])
+	// for _, v:= range s{
+	// 	fmt.Printf("%T\n", v)
+	// }
 
 	
 	tests := []struct{
 		a string
 		b string
+		except string
 		want bool
 	}{
-		{"abcabcdabcefghi", "abcdabc", true},
-		{"ddabaad", "aa", true},
-		{"dfasdfasdfasdf", "abcabcabdabc", false},
+		{"ADOBECODEBANC", "ABC", "BANC", true},
 	}
 	for _, test := range tests{
-		if got := kmp(test.a, test.b); got != test.want{
-			fmt.Printf("kmp(%v, %v)=%t, want=%t, test failed\n", test.a, test.b, got, test.want)
+		if got := shortestSummary(test.a, test.b); (got == test.except) != test.want{
+			fmt.Printf("shortestSummary(\"%v\",\"%v\")=%s, want=%t, test failed\n", test.a, test.b, got, test.want)
 		}
 	}
+
 }
