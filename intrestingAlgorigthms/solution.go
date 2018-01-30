@@ -141,6 +141,113 @@ func LongestComSubstr(s1 string, s2 string)[]string{
 	return ret
 }
 
+func FullCharaters(s string)string{
+    used := make(map[rune]bool)
+    for i, j:='A', 'a'; i <= 'Z' && j <= 'z';{
+        used[i] = false
+        used[j] = false
+        i++
+        j++
+    }
+    var ret string
+    for _, c := range s{
+        if !used[c]{
+			ret += string(c)
+			used[c] = true
+        }
+    }
+    return ret
+}
+
+func leastBeauties(stationBeauties []int, reachStations [][]int)int{
+    n := len(stationBeauties)
+    if n == 0{
+        return 0 
+    }else if n == 1{
+        return stationBeauties[0]
+    }else if n == 2{
+        return stationBeauties[0] + stationBeauties[1]
+    }
+
+    beauties := make([]int, n)
+    beauties[0] = stationBeauties[0]
+    for i:=1; i < n; i++{
+        minBeauties := beauties[reachStations[i][0]]
+        for j:=1; j < len(reachStations[i]); j++{
+            if minBeauties > beauties[reachStations[i][j]]{
+                minBeauties = beauties[reachStations[i][j]]
+            }
+        }
+        beauties[i] = stationBeauties[i]+minBeauties
+    }
+    return beauties[n-1]
+}
+
+// func fullCombine(s string)[]string{
+// 	charaters := make([]rune, )
+// }
+
+func kmp(a string, b string) bool{
+	la := len(a)
+	lb := len(b)
+	if la < lb{
+		return false
+	}
+	next := make([]int, lb-1)
+	for i:=0; i < lb-1; i++{
+		next[i] = 0
+	}
+	// for i:=0; i < lb-1; i++{
+	// 	j := 0
+	// 	start := j + 1
+	// 	k := j + 1
+	// 	count := 0
+	// 	for k <= i {
+	// 		if b[j] == b[k]{
+	// 			j++
+	// 			k++
+	// 			count++
+	// 		}else{
+	// 			k = start + 1
+	// 			start++
+	// 			j = 0
+	// 			count =0
+	// 		}
+	// 	}
+	// 	if count > 0{
+	// 		next[i] += count
+	// 	}
+	// }
+
+	fmt.Println(b)
+	for q, k :=1, 0; q < lb-1; q++{
+		for k > 0 && b[q] != b[k]{
+			k--
+		}
+		if b[q] == b[k]{
+			k++
+		}
+		next[q] = k
+		fmt.Println(q, k, next)
+	}
+
+	fmt.Println(next)
+
+	j := 0
+	for i:=0; i < la && j < lb;{
+		if a[i] == b[j]{
+			i++
+			j++
+		}else{
+			if j == 0{
+				i++
+			}else{
+				j = next[j-1]
+			}
+		}
+	}
+	return j == lb
+}
 func main(){
 	// tests := []struct{
 	// 	input string
@@ -173,7 +280,51 @@ func main(){
 	// 	}
 	// }
 
-	// fmt.Println(fullCombination("WHL"))
-	fmt.Println(LongestComSubstr("abcxyzabcrst", "opqrstabc"))
+	// tests := []struct{
+	// 	input []int
+	// 	expect int
+	// 	want bool
+	// }{
+	// 	{[]int{89, 256, 78, 1, 46, 78, 8}, 3, true},
+	// 	{[]int{6, 4, 8, 2, 17}, 3, true},
+	// }
+	// for _, test := range tests{
+	// 	if got := LongestSubList1(test.input); (got == test.expect) != test.want{
+	// 		fmt.Printf("LongestSubList1(%v)=%d, except=%d, test failed\n", test.input, got, test.expect)
+	// 	}
+	// }
 
+	// tests := []struct{
+	// 	stationBeauties []int
+	// 	reachStations [][]int
+	// 	expect int
+	// 	want bool
+	// }{
+	// 	{[]int{0,1,1,3,6}, [][]int{[]int{0}, []int{0}, []int{1}, []int{0}, []int{2,3}}, 8, true},
+	// }
+	// for _, test := range tests{
+	// 	if got := leastBeauties(test.stationBeauties, test.reachStations); (got == test.expect) != test.want{
+	// 		fmt.Printf("leastBeauties(%v, %v)=%d, except=%d, test failed\n", test.stationBeauties, test.reachStations, got, test.expect)
+	// 	}else{
+	// 		fmt.Println(got)
+	// 	}
+	// }
+
+	// fmt.Println(FullCharaters("abcqweracb"))
+
+	
+	tests := []struct{
+		a string
+		b string
+		want bool
+	}{
+		{"abcabcdabcefghi", "abcdabc", true},
+		{"ddabaad", "aa", true},
+		{"dfasdfasdfasdf", "abcabcabdabc", false},
+	}
+	for _, test := range tests{
+		if got := kmp(test.a, test.b); got != test.want{
+			fmt.Printf("kmp(%v, %v)=%t, want=%t, test failed\n", test.a, test.b, got, test.want)
+		}
+	}
 }
