@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"sort"
 )
 
 
@@ -60,116 +59,86 @@ func UpgradeLevel(baseValue int, monsters []int)int{
 	return ret
 }
 
-func LongestSubList(nums []int)int{
-	n := len(nums)
-	if n <=1 {
-		return n
+func fullCombination(s string)[]string{
+	// fmt.Println(s)
+	n := len(s)
+	if n <= 1{
+		return []string{s}
 	}
-	sortedNums := make([]int, n)
-	copy(sortedNums, nums)
-	sort.Ints(sortedNums)
-	//此时问题转换为求nums和sortedNums最长公共子序列问题
-	common :=make([][]int, n+1)
-	for i:=0; i<n+1; i++{
-		common[i] = make([]int, n+1)
+	chars := make(map[rune]bool)
+	for _, v := range s{
+		chars[v] = true
 	}
-	for i:=0; i<n+1; i++{
-		common[0][i] = 0
-		common[i][0] = 0
-	}
-	for i:=1; i<n+1;i++{
-		for j:=1; j<n+1; j++{		
-			if nums[i-1] == sortedNums[j-1]{
-				common[i][j] = common[i-1][j-1] + 1
-			}else{
-				common[i][j] = max(common[i-1][j], common[i][j-1])
-			}
+	var new_s string
+	for i:='A'; i <= 'Z'; i++{
+		if chars[i]{
+			new_s += string(i)
 		}
 	}
-	// fmt.Println(common)
-	return common[n][n]
+	
+	var combine func(string)[]string
+	combine = func(ss string)[]string{
+		n := len(ss)
+		if n <= 1{
+			return []string{ss}
+		}else if n==2 {
+			s1 := ss
+			s2 := string(ss[1])+string(ss[0])
+			return []string{s1, s2}
+		}else{
+			var ret []string
+			for i:=0; i<n; i++{
+				var t []string
+				if i < n-1{
+					t = combine(ss[0:i] +ss[i+1:])
+				}else{
+					t = combine(ss[0:i])
+				}
+				for j:=0; j < len(t); j++{
+					ret = append(ret, string(ss[i])+t[j])
+				}
+			}
+			return ret
+		}
+	}
+	return combine(new_s)
 }
 
-func max(a int, b int)int{
-	if a>b{
-		return a
+func LongestComSubstr(s1 string, s2 string)[]string{
+	var subStr []string
+	n1, n2 := len(s1), len(s2)
+	if n1 <=1 || n2 <=1{
+		return subStr
+	}
+	for i := 0; i < n1-1; i++{
+		for j := 0; j < n2-1; j++{
+			p1, p2 := i, j
+			for p1 < n1 && p2 < n2 && s1[p1] == s2[p2] {
+				p1++
+				p2++
+			}
+			if p1 > i{
+				subStr = append(subStr, s1[i:p1])
+			}
+		}
+		fmt.Println(i)
+	}
+	var ret []string
+	m := len(subStr)
+	if m == 0{
+		return ret
 	}else{
-		return b
-	}
-}
-
-
-func LongestSubList1(nums []int)int{
-	n := len(nums)
-	if n <=1 {
-		return n
-	}
-	common := make([]int, n)
-	common[0] = 1
-	for i:=1; i<n; i++{
-		max := 0
-		for j:=i-1; j>=0; j--{
-			if nums[j] <= nums[i] && max < common[j]{
-				max = common[j]
+		ret = append(ret, subStr[0])	
+		for i:=1; i < len(subStr); i++{
+			if len(subStr[i]) > len(ret[0]){
+				ret = ret[0:0]
+				ret = append(ret, subStr[i])
+			}else if len(subStr[i]) == len(subStr[0]){
+				ret = append(ret, subStr[i])
 			}
 		}
-		common[i] = max + 1
 	}
-	ret := common[0]
-	for i:=1; i<n; i++{
-		if common[i] > ret{
-			ret = common[i]
-		}
-	}
-	fmt.Println(common)
 	return ret
-}
-
-
-func FullCharaters(s string)string{
-    used := make(map[rune]bool)
-    for i, j:='A', 'a'; i <= 'Z' && j <= 'z';{
-        used[i] = false
-        used[j] = false
-        i++
-        j++
-    }
-    var ret string
-    for _, c := range s{
-        if !used[c]{
-			ret += string(c)
-			used[c] = true
-        }
-    }
-    return ret
-}
-
-func leastBeauties(stationBeauties []int, reachStations [][]int)int{
-    n := len(stationBeauties)
-    if n == 0{
-        return 0 
-    }else if n == 1{
-        return stationBeauties[0]
-    }else if n == 2{
-        return stationBeauties[0] + stationBeauties[1]
-    }
-
-    beauties := make([]int, n)
-    beauties[0] = stationBeauties[0]
-    for i:=1; i < n; i++{
-        minBeauties := beauties[reachStations[i][0]]
-        for j:=1; j < len(reachStations[i]); j++{
-            if minBeauties > beauties[reachStations[i][j]]{
-                minBeauties = beauties[reachStations[i][j]]
-            }
-        }
-        beauties[i] = stationBeauties[i]+minBeauties
-    }
-    return beauties[n-1]
-}
-
-func fullCombine(s string)[]string{
-	charaters := make([]rune, )
 }
 
 func main(){
@@ -195,7 +164,7 @@ func main(){
 	// 	expect int
 	// 	want bool
 	// }{
-	// 	{50, []int{50, 105, 200}, 1101, true},
+	// 	{50, []int{50, 105, 200}, 110, true},
 	// 	{20, []int{30, 20, 15, 40, 100}, 205, true},
 	// }
 	// for _, test := range tests{
@@ -204,35 +173,7 @@ func main(){
 	// 	}
 	// }
 
-	// tests := []struct{
-	// 	input []int
-	// 	expect int
-	// 	want bool
-	// }{
-	// 	{[]int{89, 256, 78, 1, 46, 78, 8}, 3, true},
-	// 	{[]int{6, 4, 8, 2, 17}, 3, true},
-	// }
-	// for _, test := range tests{
-	// 	if got := LongestSubList1(test.input); (got == test.expect) != test.want{
-	// 		fmt.Printf("LongestSubList1(%v)=%d, except=%d, test failed\n", test.input, got, test.expect)
-	// 	}
-	// }
+	// fmt.Println(fullCombination("WHL"))
+	fmt.Println(LongestComSubstr("abcxyzabcrst", "opqrstabc"))
 
-	tests := []struct{
-		stationBeauties []int
-		reachStations [][]int
-		expect int
-		want bool
-	}{
-		{[]int{0,1,1,3,6}, [][]int{[]int{0}, []int{0}, []int{1}, []int{0}, []int{2,3}}, 8, true},
-	}
-	for _, test := range tests{
-		if got := leastBeauties(test.stationBeauties, test.reachStations); (got == test.expect) != test.want{
-			fmt.Printf("leastBeauties(%v, %v)=%d, except=%d, test failed\n", test.stationBeauties, test.reachStations, got, test.expect)
-		}else{
-			fmt.Println(got)
-		}
-	}
-
-	// fmt.Println(FullCharaters("abcqweracb"))
 }
