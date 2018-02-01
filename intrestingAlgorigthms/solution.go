@@ -301,6 +301,177 @@ func shortestSummary(s string, t string) string{
 	return s[absStart:absEnd+1]
 }
 
+func Monopoly(n int) int{
+	var ret int
+
+	return ret
+}
+
+func largestRectangleArea(heights []int)int{
+    length := len(heights)
+    if length == 0{
+        return 0
+    }else if length == 1{
+        return heights[0]
+    }
+    maxArea := 0
+    for i:=0; i < length; i++{
+        l, r :=1, 0
+        for j:= i-1; j >= 0; j--{
+            if heights[j] < heights[i]{
+                break
+            }else{
+                l++
+            }
+        }
+        
+        for j:= i+1; j < length; j++{
+            if heights[j] < heights[i]{
+                break
+            }else{
+                r++
+            }
+        }
+
+        curr := heights[i] * (l + r)
+        if curr > maxArea{
+            maxArea = curr
+        }
+    }
+    return maxArea
+}
+
+func largestRectangleArea1(heights []int)int{
+	length := len(heights)
+    if length == 0{
+        return 0
+    }else if length == 1{
+        return heights[0]
+	}
+	heights = append(heights, 0)
+	maxArea := 0
+	stack := []int{0}
+    for i:=1; i < length+1; i++{
+		for len(stack) >0 && heights[i] < heights[stack[len(stack)-1]]{
+			h := heights[stack[len(stack)-1]]
+			var w int
+			stack = stack[0:len(stack)-1]
+			if len(stack) == 0{
+				w = i
+			}else{
+				w = i - 1 - stack[len(stack)-1]
+			}
+			if maxArea < w*h{
+				maxArea = w*h
+			}
+		}
+		stack = append(stack, i)
+	}
+	return maxArea
+}
+
+type Node struct{
+	Value int
+	Left *Node
+	Right *Node
+}
+
+func getPath(head *Node, target int)[]int{
+	if head == nil{
+		return nil
+	}
+	if head.Value == target{
+		return []int{head.Value}
+	}
+
+	var heap []int
+	var list []*Node
+	list = append(list, head)
+	heap = append(heap, head.Value)
+	allListNil := true
+	for len(list) > 0{
+		temp := make([]*Node, len(list))
+		copy(temp, list)
+		fmt.Print("list is [ ")
+		for _, v := range list{
+			if v == nil{
+				fmt.Print("nil ")
+			}else{
+				fmt.Print(v.Value, " ")
+			}
+		}
+		fmt.Println("]")
+		fmt.Println("heap is ", heap)
+		list = list[0:0]
+		for len(temp) > 0{
+			t := temp[0]
+			if t == nil{
+				heap = append(heap, 0, 0)
+				list = append(list, nil, nil)
+				if len(temp) == 1{
+					temp = temp[0:0]
+				}else{
+					temp = temp[1:len(temp)]
+				}
+				continue
+			}
+			if t.Left != nil{
+				heap = append(heap, t.Left.Value)
+				list = append(list, t.Left)
+				if t.Left.Value == target{
+					list = list[0:0]
+					break
+				}
+				allListNil = false
+			}else if t.Left == nil{
+				heap = append(heap, 0)
+				list = append(list, nil)
+			}
+			
+			if t.Right != nil{
+				heap = append(heap, t.Right.Value)
+				list = append(list, t.Right)
+				if t.Right.Value == target{
+					list = list[0:0]
+					break
+				}
+				allListNil = false
+			}else if t.Right == nil{
+				heap = append(heap, 0)
+				list = append(list, nil)
+			}
+			
+			if len(temp) == 1{
+				temp = temp[0:0]
+			}else{
+				temp = temp[1:len(temp)]
+			}
+		}
+		if !allListNil{
+			allListNil = true
+			continue
+		}else{
+			break
+		}
+	}
+	if heap[len(heap)-1] != target{
+		return nil
+	}
+	var ret []int
+	lenHeap := len(heap)
+	index := lenHeap-1
+	for index > 0{
+		ret = append(ret, heap[index])
+		index = (index-1)/2
+	}
+	ret = append(ret, heap[0])
+	for start, end := 0, len(ret)-1; start < end; {
+		ret[start], ret[end] = ret[end], ret[start]
+		start++
+		end--
+	}
+	return ret
+}
 
 func main(){
 	// tests := []struct{
@@ -397,18 +568,43 @@ func main(){
 	// }
 
 	
-	tests := []struct{
-		a string
-		b string
-		except string
-		want bool
-	}{
-		{"ADOBECODEBANC", "ABC", "BANC", true},
-	}
-	for _, test := range tests{
-		if got := shortestSummary(test.a, test.b); (got == test.except) != test.want{
-			fmt.Printf("shortestSummary(\"%v\",\"%v\")=%s, want=%t, test failed\n", test.a, test.b, got, test.want)
-		}
-	}
+	// tests := []struct{
+	// 	a string
+	// 	b string
+	// 	except string
+	// 	want bool
+	// }{
+	// 	{"ADOBECODEBANC", "ABC", "BANC", true},
+	// }
+	// for _, test := range tests{
+	// 	if got := shortestSummary(test.a, test.b); (got == test.except) != test.want{
+	// 		fmt.Printf("shortestSummary(\"%v\",\"%v\")=%s, want=%t, test failed\n", test.a, test.b, got, test.want)
+	// 	}
+	// }
+	
+	// tests := []struct{
+	// 	input []int
+	// 	except int
+	// 	want bool
+	// }{
+	// 	{[]int{2, 1, 5, 6, 2, 3}, 10, true},
+	// }
+	// for _, test := range tests{
+	// 	if got := largestRectangleArea1(test.input); (got == test.except) != test.want{
+	// 		fmt.Printf("largestRectangleArea1(\"%v\")=%d, want=%t, test failed\n", test.input, got, test.want)
+	// 	}
+	// }
+
+	node1 := &Node{6, nil, nil}
+	node2 := &Node{5, node1, nil}
+	node3 := &Node{9, nil, nil}
+	node4 := &Node{4, nil, node2}
+	node5 := &Node{7, node3, nil}
+	node6 := &Node{8, nil, nil}
+	node7 := &Node{2, node4, nil}
+	node8 := &Node{3, node5, node6}
+	node9 := &Node{1, node7, node8}
+	
+	fmt.Println(getPath(node9, 9))
 
 }
