@@ -473,6 +473,78 @@ func getPath(head *Node, target int)[]int{
 	return ret
 }
 
+func getPath1(head *Node, target int)[]int{
+	var traverse []int
+	var preTreaverse func(h *Node, t int)
+	preTreaverse = func(h *Node, t int){
+		if h == nil{
+			return
+		}
+		if h.Value == t{
+			traverse = append(traverse, t)
+			return
+		}
+		var stack []*Node
+		stack = append(stack, h)
+		traverse = append(traverse, h.Value)
+		h = h.Left
+		for !(len(stack) == 0 && h == nil){
+			for h != nil{
+				traverse = append(traverse, h.Value)
+				if h.Value == t{
+					return
+				}
+				stack = append(stack, h)
+				h = h.Left
+			}
+			h = stack[len(stack)-1].Right
+			stack = stack[0:len(stack)-1]
+		}
+	}
+	if head != nil{
+		preTreaverse(head, target)
+	}
+	fmt.Println(traverse)
+	if traverse[len(traverse)-1] != target{
+		return []int{}
+	}
+	var ret []int
+	ret = append(ret, head.Value)
+	for head.Value != target{
+		fmt.Println(head.Value)
+		if head.Left == nil && head.Right == nil{
+			return []int{}
+		}
+		if head.Left == nil{
+			ret = append(ret, head.Right.Value)
+			head = head.Right
+		}else if head.Right == nil{
+			ret = append(ret, head.Left.Value)
+			head = head.Left
+		}else{
+			isRight := false
+			for i:=0; i < len(traverse); i++{
+				if traverse[i] == head.Right.Value{
+					ret = append(ret, head.Right.Value)
+					head = head.Right
+					isRight = true
+					if i < len(traverse) - 2{
+						traverse = traverse[i+1:]
+					}else{
+						traverse = traverse[i+1:]
+					}
+					break
+				}
+			}
+			if !isRight{
+				ret = append(ret, head.Left.Value)
+				head = head.Left
+			}
+		}
+	}
+	return ret
+}
+
 func main(){
 	// tests := []struct{
 	// 	input string
@@ -605,6 +677,6 @@ func main(){
 	node8 := &Node{3, node5, node6}
 	node9 := &Node{1, node7, node8}
 	
-	fmt.Println(getPath(node9, 9))
+	fmt.Println(getPath1(node9, 9))
 
 }
