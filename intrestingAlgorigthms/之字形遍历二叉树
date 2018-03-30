@@ -1,0 +1,63 @@
+leetcode 上 103 题是之字形遍历二叉树，有个朋友面试遇到了，这里纪念下。
+
+分析下这道题挺简单，之字形遍历就是按行遍历，典型的广度优先；“之字形”就是对每一行正反序遍历，加个 sequence 的标志即可。
+
+```golang
+package main
+import (
+    "fmt"
+)
+
+type TreeNode struct {
+    Val int
+    Left *TreeNode
+    Right *TreeNode
+}
+
+func zigzagLevelOrder(root *TreeNode) [][]int {
+    if root == nil{
+        return nil
+    }
+    ret := make([][]int, 0)
+    squence := true
+    list := make([]*TreeNode, 0)
+    list = append(list, root)
+    for len(list) > 0{
+        t := make([]int, 0)
+        l := len(list)
+	    if squence{
+            for i:=0; i < l; i++{
+                t = append(t, list[i].Val)
+            }
+        }else{
+            for i:=l-1; i >= 0; i--{
+                t = append(t, list[i].Val)
+            }
+        }
+        squence = !squence
+        ret = append(ret, t)
+        tempList := make([]*TreeNode, 0)
+        for i:=0; i < l; i++{
+            if list[i].Left != nil{
+                tempList = append(tempList, list[i].Left)
+            }
+            if list[i].Right != nil{
+                tempList = append(tempList, list[i].Right)
+            }
+        }
+        list = tempList
+    }
+    return ret
+}
+
+func main(){
+   // node1 := &TreeNode{15, nil, nil}
+   // node2 := &TreeNode{7, nil, nil}
+   // node3 := &TreeNode{20, node1, node2}
+   // node4 := &TreeNode{9, nil, nil}
+   // node5 := &TreeNode{3, node4, node3}
+
+    t := zigzagLevelOrder(nil)
+    fmt.Printf("%t", t)
+}
+```
