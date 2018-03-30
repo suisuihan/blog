@@ -545,6 +545,49 @@ func getPath1(head *Node, target int)[]int{
 	return ret
 }
 
+
+type TreeNode struct {
+    Val int
+    Left *TreeNode
+    Right *TreeNode
+}
+
+func zigzagLevelOrder(root *TreeNode) [][]int {
+    if root == nil{
+        return nil
+    }
+    ret := make([][]int, 0)
+    squence := true
+    list := make([]*TreeNode, 0)
+    list = append(list, root)
+    for len(list) > 0{
+        t := make([]int, 0)
+        l := len(list)
+	    if squence{
+            for i:=0; i < l; i++{
+                t = append(t, list[i].Val)
+            }
+        }else{
+            for i:=l-1; i >= 0; i--{
+                t = append(t, list[i].Val)
+            }
+        }
+        squence = !squence
+        ret = append(ret, t)
+        tempList := make([]*TreeNode, 0)
+        for i:=0; i < l; i++{
+            if list[i].Left != nil{
+                tempList = append(tempList, list[i].Left)
+            }
+            if list[i].Right != nil{
+                tempList = append(tempList, list[i].Right)
+            }
+        }
+        list = tempList
+    }
+    return ret
+}
+
 func main(){
 	// tests := []struct{
 	// 	input string
